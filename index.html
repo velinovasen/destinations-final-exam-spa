@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Destinations</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="./node_modules/handlebars/dist/handlebars.min.js"></script>
+    <script src="router.js" defer></script>
+    <script src="init.js" defer></script>
+    <script src="services.js" defer></script>
+</head>
+
+<body>
+
+    <div id="container">
+        <div id="header-element"></div>
+
+        <div id="root"></div>
+        <!-- Footer  -->
+        <footer>@SoftUni Destinations 2020</footer>
+    </div>
+
+    <!-- MY VIEWS  -->
+
+
+    <script type="text/x-handlebars-template" id="notifications">
+        <!-- Notifications -->
+        <div>
+            <div class="notification loadingBox">
+                Loading …
+            </div>
+            <div class="notification infoBox">
+                Info
+            </div>
+            <div class="notification errorBox">
+                Error: destination name can't be empty!
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-handlebars-template" id="navbar">
+        <!-- Header -->
+        <nav>
+            <div class="left-container">
+                <ul>
+                    <li><a href="/home" onclick="homeButton(event)">Home</a></li>
+                    {{#if isAuth}}
+                    <li><a href="/destinations" onclick="myDestinations(event)">Destinations</a></li>
+                    <li><a href="/create" onclick="createNewItem(event)">Add +</a></li>
+                    {{else}}
+                    <li><a href="/login" onclick="loginNowButton(event)">Login</a></li>
+                    <li><a href="/register" onclick="registerNowButton(event)">Register</a></li>
+                    {{/if}}
+                </ul>
+            </div>
+            <div class="right-container">
+                {{#if isAuth}}
+                <span>Welcome, {{email}} |</span>
+                <a href="" class="log-out" onclick="logoutButton(event)">Logout</a>
+                {{/if}}
+            </div>
+        </nav>
+    </script>
+
+    <script type="text/x-handlebars-template" id="register-template">
+        <!-- Register -->
+        <section id="viewRegister">
+            <div class="notification loadingBox" id="loading-bar">
+                Loading …
+            </div>
+            <div class="notification errorBox" style="display: none;" id="reg-error-box">
+                Error: destination name can't be empty!
+            </div>
+            <h2>Create your account:</h2>
+            <form id="formRegister">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" placeholder="Email">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Password">
+                <label for="rePassword">Repeat Password:</label>
+                <input type="password" id="rePassword" name="rePassword" placeholder="Repeat Password">
+                <input type="submit" class="register" value="Register" onclick="registerSubmitButton(event)">
+            </form>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="login-template">
+        <div class="notification loadingBox" id="loading-bar">
+            Loading …
+        </div>
+        <div class="notification infoBox" id="success-login-form">
+            Logged in succesfully
+        </div>
+        <div class="notification errorBox" id="error-login-form">
+            Error: check your credentials!
+        </div>
+        <!-- Login -->
+        <section id="viewLogin">
+            <h2>Login to your account:</h2>
+            <form id="formLogin">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" placeholder="Enter your Email">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your Password">
+                <input type="submit" class="login" value="Login" onclick="loginSubmitButton(event)">
+            </form>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="home-template">
+        <!-- Home -->
+        <section id="viewCatalog" class="background-img">
+            {{#if isAuth}}
+            {{#if hasItems}}
+            <div class="added-destinations">
+                {{#each items}}
+                <a href="/details" class="added-destination" id="{{key}}" onclick="detailsButton(event)">
+                    <img src="{{imgUrl}}"
+                        alt="" class="picture-added-destination">
+                    <h3>{{destination}}</h3>
+                    <span>to {{city}} </span><span>{{departureDate}}</span>
+                </a>
+                {{/each}}
+            </div>
+            <p></p>
+            {{/if}}
+            {{else}}
+            <div class="guest">
+                No destinations possible! Please sign in...
+            </div>
+            {{/if}}
+        </section>
+        
+    </script>
+
+    <script type="text/x-handlebars-template" id="create-template">
+        <!-- Create  -->
+        <section id="viewAdddestination">
+            <div class="notification loadingBox" id="loading-bar">
+                Loading …
+            </div>
+            <div class="notification infoBox" id="success-create-form" style="display: none;">
+                The destination was created succesfully
+            </div>
+            <div class="notification errorBox" id="error-create-form" style="display: none;">
+                Error: please check your credentials!
+            </div>
+            <h2>Add new destination</h2>
+            <form id="formAdddestination">
+                <label for="destination">Destination name:</label>
+                <input type="text" id="destination" name="destination" placeholder="Destination name">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" placeholder="City">
+                <label for="duration">Duration:</label>
+                <input type="number" id="duration" name="duration" placeholder="Duration">
+                <label for="departureDate">Departure Date:</label>
+                <input type="date" id="departureDate" name="departureDate">
+                <label for="imgUrl">Image:</label>
+                <input type="text" id="imgUrl" name="imgUrl" placeholder="https://">
+
+                <input type="submit" class="create" value="Add" onclick="createButton(event)">
+            </form>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="details-template">
+        <!-- Details  -->
+        <section id="viewdestinationDetails">
+            <div class="destination-area">
+                <div class="destination-area-left">
+                    <img src="{{imgUrl}}"
+                        alt="">
+                </div>
+                <div class="destination-area-right">
+                    <h3>{{destination}}</h3>
+                    <div>to {{city}}</div>
+                    <div class="data-and-time">
+                        {{departureDate}}
+                        {{#if owner}}
+                        <a href="/edit" class="edit-destination-detail" id="{{id}}" onclick="editItem(event)"></a>
+                        {{/if}}
+                    </div>
+                    <div>
+                        {{duration}} days
+                    </div>
+                </div>
+            </div>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="edit-template">
+        <!-- Edit  -->
+        <section id="viewEditdestination">
+            <div class="notification loadingBox" id="loading-bar">
+                Loading …
+            </div>
+            <div class="notification errorBox" id="error-edit-form" style="display: none;">
+                Error: Check your input fields!
+            </div>
+            <div class="notification infoBox" id="success-edit-form" style="display: none;">
+                The edit was successfull
+            </div>
+            <h2>Edit existing destination</h2>
+            <form id="formAdddestination">
+                <label for="destination">Destination name:</label>
+                <input type="text" id="destination" name="destination" value="{{destination}}">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" value="{{city}}">
+                <label for="duration">Duration:</label>
+                <input type="number" id="duration" name="duration" value="{{duration}}">
+                <label for="departureDate">Departure Date:</label>
+                <input type="date" id="departureDate" name="departureDate" value="{{departureDate}}">
+                <label for="imgUrl">Image:</label>
+                <input type="text" id="imgUrl" name="imgUrl"
+                    value="{{imgUrl}}">
+
+                <input type="submit" class="create" value="Edit" onclick="editItemButtonSubmit(event)" id={{id}}>
+            </form>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="destinations-template">
+        <!-- Details Dashboard  -->
+        <section id="viewMydestinations">
+            {{#if hasMyDestin}}
+            <div class="notification loadingBox" id="loading-bar">
+                Loading …
+            </div>
+            <div class="notification infoBox" id="success-delete-form" style="display: none;">
+                The destination was deleted successfully!
+            </div>
+            <h3>Your destinations</h3>
+                {{#each myDestin}}
+                
+                <div class="destination-ticket">
+                    <div class="destination-left">
+                        <img src="{{imgUrl}}"
+                            alt="">
+                    </div>
+                    <div class="destination-right">
+                        <div>
+                            <h3>{{destination}}</h3><span>{{departureDate}}</span>
+                        </div>
+                        <div>
+                            to {{city}}
+                        </div>
+                        <p>{{duration}} days </p>
+                        <a href="" class="remove" id="{{key}}" onclick="deleteItem(event)">REMOVE</a>
+                        <a href="/details" class="details" id="{{key}}" onclick="editItem(event)">Details</a>
+                    </div>
+                </div>
+                {{/each}}
+            {{else}}
+            <h2>You have no destinations</h2>
+            {{/if}}
+            
+            
+        </section>
+    </script>
+</body>
+
+</html>
